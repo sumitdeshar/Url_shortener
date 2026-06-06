@@ -22,7 +22,7 @@ The goal of this project is to build a basic URL shortening service that:
 - **Backend:** Django (Python)
 - **Database:** PostgreSQL
 - **Cache:** Redis
-- **Queue (planned):** Celery / Redis Queue
+- **Queue (planned):** Redis Queue
 - **Server:** Gunicorn / Django Development Server
 
 ---
@@ -100,3 +100,4 @@ This project demonstrates understanding of:
 
 This is a learning-focused project created for interview preparation.  
 The architecture is intentionally simple and will evolve as features are added.
+This is build with AI wording on top of my documentations idea.

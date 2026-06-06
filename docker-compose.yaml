@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16
+    container_name: url_shortener_psql
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: short_url
+      POSTGRES_PASSWORD: veryshort
+      POSTGRES_DB: short_url_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - short_url_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U short_url -d short_url_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: short_url_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    container_name: url_shortener_django_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - .:/app # ← root maps to /app
+    command: python url_shortener/manage.py runserver 0.0.0.0:8000
+
+volumes:
+  short_url_pg_data:
