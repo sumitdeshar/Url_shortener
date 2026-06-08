@@ -6,7 +6,7 @@ from django.contrib import auth
 from rest_framework.decorators import api_view
 from rest_framework import status
 
-from .serailizers import *
+from .serializers import *
 
 User = get_user_model()
 

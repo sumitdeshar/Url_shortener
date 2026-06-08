@@ -22,6 +22,11 @@ def createshortcode(shortcode_length):
     shortcode = "".join([hash_dict[num] for num in sample_num_list])
     print(shortcode )
 
-hash_dict = generate_lookup()
+# hash_dict = generate_lookup()
 
-res = createshortcode(shortcode_length)
+# res = createshortcode(shortcode_length)
+
+def generate_url(shortcode):
+    url = 'http://chotkarily/'
+    
+    new_url = url.join(shortcode)

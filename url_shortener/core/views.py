@@ -4,8 +4,9 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.decorators import api_view
 from rest_framework import status
+from .utlis import createshortcode, generate_url
 
-from .serailizers import *
+from .serializers import *
 
 User = get_user_model()
 
@@ -13,13 +14,23 @@ User = get_user_model()
 @api_view(["POST"])
 def url_shortener_aka_Chhotkarily(request):
     try:
+        print('got data')
         jsondata = request.data
         serializer = UrlSerializer(data=jsondata)
-        
+        print ('done serializing')
         if serializer.is_valid():
             original_url = serializer.validated_data.get("original_url")
             
-        print(original_url)
+        shortcode = createshortcode(serializer.shortcode_length)
+            
+        # short_url = generate_url()
+        
+        
+        
+        return JsonResponse({
+            'original': original_url,
+            'short url': shortcode,
+        })
         
 
             
