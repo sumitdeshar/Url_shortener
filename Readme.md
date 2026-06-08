@@ -1,4 +1,4 @@
-# 🔗 URL Shortener
+# 🔗 URL Shortener (Chhotkarily)
 
 A simple and scalable URL shortener service built using **Django**, **PostgreSQL**, and **Redis**.  
 This project is built as part of a **backend skill assessment for interview preparation**, focusing on system design fundamentals like caching, database design, and background processing.

@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
+from .views import *
 
 urlpatterns = [
-    # path('', views.home, name="home"),
+    path('/generate-short-url', url_shortener_aka_Chhotkarily, name="url_shortener_aka_Chhotkarily"),
 ]
