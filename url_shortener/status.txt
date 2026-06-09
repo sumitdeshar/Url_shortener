@@ -1,0 +1,12 @@
+Operation	Status Code
+GET all users	        200
+GET one user	        200
+User not found	        404
+Create user	            201
+Update user	            200
+Delete user	            204
+Invalid request	        400
+Not authenticated	    401
+No permission	        403
+Duplicate resource	    409
+Unexpected server error	500

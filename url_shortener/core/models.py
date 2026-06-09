@@ -6,11 +6,11 @@ import uuid
 
 from django.conf import settings
 
-class ShortCodeTable(models.Model):
+class LinkTable(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_link = models.URLField(max_length=2048)
-    short_code = models.CharField(max_length=20, unique=True, db_index=True)
+    short_link = models.CharField(max_length=20, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     expires_at = models.DateTimeField(null=True, blank=True)
@@ -21,7 +21,9 @@ class ShortCodeTable(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="created_links"
+        related_name="created_links",
+        null=True,
+        blank=True
     )
 
     def save(self, *args, **kwargs):
@@ -30,10 +32,14 @@ class ShortCodeTable(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.short_code} -> {self.original_link}"
+        return f"{self.short_link} -> {self.original_link}"
 
     class Meta:
         ordering = ["-created_at"]
+        
+class ShortCode(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    short_code = models.CharField(max_length=20, unique=True, db_index=True)
         
 
 #This is used to store a hash map of the alphanumeric characters

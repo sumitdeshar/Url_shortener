@@ -15,3 +15,7 @@ User = get_user_model()
 class UrlSerializer(serializers.Serializer):
     original_url = serializers.URLField()
     shortcode_length = serializers.IntegerField()
+    
+class LookUpTableSerializer(serializers.Serializer):
+    # name = serializers.CharField()
+    hash_matrix = serializers.JSONField()
