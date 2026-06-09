@@ -2,7 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('create-short-url/', push_look_up_table, name="create url"),
-    path('get-short-url/', pull_look_up_table, name="get url"),
-    path('generate-short-url/', url_shortener_aka_Chhotkarily, name="url shortener aka Chhotkarily"),
+    path('create-short-url/', create_lookup_table, name="create url"),
+    path('get-short-url/', get_lookup_table, name="get url"),
+    path('generate-short-url/', shorten_url, name="url shortener aka Chhotkarily"),
 ]

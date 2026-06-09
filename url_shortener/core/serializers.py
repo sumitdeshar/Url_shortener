@@ -16,6 +16,6 @@ class UrlSerializer(serializers.Serializer):
     original_url = serializers.URLField()
     shortcode_length = serializers.IntegerField()
     
-class LookUpTableSerializer(serializers.Serializer):
+class CharMapSerializer(serializers.Serializer):
     # name = serializers.CharField()
     hash_matrix = serializers.JSONField()

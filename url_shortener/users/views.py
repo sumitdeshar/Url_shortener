@@ -14,8 +14,8 @@ User = get_user_model()
 @api_view(["POST"])
 def  register_user(request):
     try:
-        jsondata = request.data
-        serializer = UserRegistrationSerializer(data=jsondata)
+        payload = request.data
+        serializer = UserRegistrationSerializer(data=payload)
         
         if serializer.is_valid():
             
@@ -49,8 +49,8 @@ def  register_user(request):
 @api_view(["POST"])
 def login(request):
     try:
-        jsondata = request.data
-        serializer = LoginSerializer(data=jsondata)
+        payload = request.data
+        serializer = LoginSerializer(data=payload)
 
         if serializer.is_valid():
             username = serializer.validated_data['username']

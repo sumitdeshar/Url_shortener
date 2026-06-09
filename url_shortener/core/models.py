@@ -6,7 +6,7 @@ import uuid
 
 from django.conf import settings
 
-class LinkTable(models.Model):
+class Link(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_link = models.URLField(max_length=2048)
@@ -37,13 +37,13 @@ class LinkTable(models.Model):
     class Meta:
         ordering = ["-created_at"]
         
-class ShortCode(models.Model):
+class UsedShortcode(models.Model):
     id = models.BigAutoField(primary_key=True)
     short_code = models.CharField(max_length=20, unique=True, db_index=True)
         
 
 #This is used to store a hash map of the alphanumeric characters
-class LookUpTable(models.Model):
+class CharMap(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True)
     
@@ -51,7 +51,7 @@ class LookUpTable(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     # to map PostgreSQL JSONB data type directly
-    hash_matrix = models.JSONField()
+    char_map = models.JSONField()
     
     def save(self, *args, **kwargs):
 

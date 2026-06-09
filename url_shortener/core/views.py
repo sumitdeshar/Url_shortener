@@ -8,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 
-from .utlis import createshortcode, generate_lookup, generate_url
-from .models import LookUpTable, ShortCode, LinkTable
+from .utlis import generate_shortcode, build_char_map, build_short_url
+from .models import CharMap, Link
 
 from .serializers import *
 
@@ -17,20 +17,21 @@ User = get_user_model()
 
 # Create your views here.
 @api_view(['POST'])
-def push_look_up_table(request):
+def create_lookup_table(request):
     try:
-        lookup_table = LookUpTable.objects.all()
+        lookup_entry = CharMap.objects.first()
+        char_map = lookup_entry.hash_matrix
         
-        if not lookup_table:
-            lookup_table=generate_lookup()
-            print(lookup_table)
+        if not char_map:
+            char_map=build_char_map()
+            print(char_map)
                 
-            if not lookup_table:
+            if not char_map:
                 return JsonResponse(
                     {"error": "Lookup table generation failed"},
                     status=400
                 )
-            LookUpTable.objects.create(hash_matrix=lookup_table)
+            CharMap.objects.create(hash_matrix=char_map)
             print('done create hash matrix')
                     
             return JsonResponse(
@@ -42,7 +43,8 @@ def push_look_up_table(request):
         else:
             return JsonResponse(
                 {
-                    "message": "Lookup already created successfully"
+                    "message": "Lookup already created successfully",
+                    "char_map": char_map
                 },
                 status=200
             )
@@ -59,10 +61,10 @@ def push_look_up_table(request):
          
          
 @api_view(['GET'])
-def pull_look_up_table(request):
+def get_lookup_table(request):
     try:
-        serializer = LookUpTableSerializer(
-            LookUpTable.objects.all(),
+        serializer = CharMapSerializer(
+            CharMap.objects.all(),
                 many=True
                 )
 
@@ -84,30 +86,31 @@ def pull_look_up_table(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def url_shortener_aka_Chhotkarily(request):
+def shorten_url(request):
     try:
-        jsondata = request.data
-        serializer = UrlSerializer(data=jsondata)
+        payload = request.data
+        serializer = UrlSerializer(data=payload)
 
         
         serializer.is_valid(raise_exception=True)
         original_url = serializer.validated_data["original_url"]
         shortcode_length = serializer.validated_data["shortcode_length"]
         
-        lookup_model=LookUpTable.objects.first()
-        # lookup_table = LookUpTableSerializer(lookup_model).data
+        lookup_entry=CharMap.objects.first()
+        # char_map = CharMapSerializer(lookup_entry).data
         #pass proper data
-        if not lookup_model:
+        if not lookup_entry:
             return JsonResponse({"error": "Lookup table missing"}, status=400)
-        lookup_table = lookup_model.hash_matrix
+        char_map = lookup_entry.hash_matrix
 
-        shortcode = createshortcode(shortcode_length=shortcode_length,lookup_table=lookup_table)
+        shortcode_result = generate_shortcode(shortcode_length=shortcode_length,char_map=char_map)
+        print(shortcode_result)
         print ('done serializing4')
         
-        if shortcode:
-            short_url=generate_url(shortcode=shortcode)
+        if shortcode_result:
+            short_url=build_short_url(shortcode=shortcode_result['shortcode'])
             
-            LinkTable.objects.create(short_link=short_url, original_link=original_url, owner=request.user)
+            Link.objects.create(short_link=short_url, original_link=original_url, owner=request.user)
             print ('done serializing5')
 
             return JsonResponse({

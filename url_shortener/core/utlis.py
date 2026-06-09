@@ -1,9 +1,9 @@
 import random
 import string
 
-from .models import ShortCode
+from .models import UsedShortcode
     
-def generate_lookup():
+def build_char_map():
     
     alphanumeric_characters = string.ascii_lowercase + string.digits + string.ascii_uppercase
 
@@ -20,22 +20,22 @@ shortcode_length = 5
 
 # hash_dict = generate_lookup()
 
-def createshortcode(shortcode_length, lookup_table):
-    msg={}
+def generate_shortcode(shortcode_length, lookup_table):
+    result={}
     while True:
-        sample_num_list = random.sample(range(0, 62), k=shortcode_length)
-        shortcode = "".join([lookup_table[num] for num in sample_num_list])
+        random_indices = random.sample(range(0, 62), k=shortcode_length)
+        candidate = "".join([lookup_table[str(num)] for num in random_indices])
 
-        if not ShortCode.objects.filter(short_code=shortcode).exists():
-            ShortCode.objects.create(short_code=shortcode)
-            msg['shortcode'] = shortcode
-            msg['utlis_msg'] = "Shortcode created and added to database"
-            return msg
+        if not UsedShortcode.objects.filter(short_code=candidate).exists():
+            UsedShortcode.objects.create(short_code=candidate)
+            result['shortcode'] = candidate
+            result['utlis_result'] = "Shortcode created and added to database"
+            return result
 
 
 # res = createshortcode(shortcode_length)
 
-def generate_url(shortcode):
+def build_short_url(shortcode):
     url = 'http://chotkarily/'
-    new_url = url + shortcode
-    return new_url
+    short_url = url + shortcode
+    return short_url
