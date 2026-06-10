@@ -16,7 +16,6 @@ def build_char_map():
 
 
 shortcode_length = random.randint(7,10)
-shortcode_length = 5
 
 # hash_dict = generate_lookup()
 
@@ -35,7 +34,10 @@ def generate_shortcode(shortcode_length, lookup_table):
 
 # res = createshortcode(shortcode_length)
 
-def build_short_url(shortcode):
-    url = 'http://chotkarily/'
-    short_url = url + shortcode
+def build_short_url(shortcode,user_domain):
+    domain = "Chotkari"
+    if user_domain:
+        domain = user_domain
+    
+    short_url = f"https://{domain}.com/{shortcode}"
     return short_url

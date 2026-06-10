@@ -142,3 +142,7 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
+LOGIN_URL          = "/login/"
+LOGIN_REDIRECT_URL = "/"   # after successful login
+LOGOUT_REDIRECT_URL = "/"  # after logout (also set in LogoutView.next_page)

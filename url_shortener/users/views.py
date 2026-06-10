@@ -3,14 +3,21 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib import auth
 
-from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
 from .serializers import *
 
 User = get_user_model()
 
 # Create your views here.
+
+from django.shortcuts import render
+
+def home(request):
+    return render(request, "home.html")
+
 @api_view(["POST"])
 def  register_user(request):
     try:
@@ -19,10 +26,10 @@ def  register_user(request):
         
         if serializer.is_valid():
             
-            username = serializer.validated_data.get("username")
-            email = serializer.validated_data.get("email")
-            password = serializer.validated_data.get("password")
-            password2 = serializer.validated_data.get("password2")
+            username = serializer.validated_data["username"] # type: ignore
+            email = serializer.validated_data["email"] # type: ignore
+            password = serializer.validated_data["password"] # type: ignore
+            password2 = serializer.validated_data["password2"] # type: ignore
         
             if password == password2:
                 if User.objects.filter(email=email).exists():
@@ -30,7 +37,7 @@ def  register_user(request):
                 elif User.objects.filter(username=username).exists():
                     return JsonResponse({'error': 'Username Already Used'}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    user = User.objects.create_user(username=username, email=email, password=password)
+                    user = User.objects.create_user(username=username, email=email, password=password) # type: ignore
                     # user.save() redundant
                     return JsonResponse({'message': 'Registration successful'}, status=status.HTTP_200_OK)
             else:
@@ -53,8 +60,8 @@ def login(request):
         serializer = LoginSerializer(data=payload)
 
         if serializer.is_valid():
-            username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
+            username = serializer.validated_data['username'] # type: ignore
+            password = serializer.validated_data['password'] # type: ignore
             
             user = authenticate(
                 username=username,
@@ -67,7 +74,7 @@ def login(request):
             return JsonResponse(
                 {
                     "message": "Login successful",
-                    "user_id": str(user.id)
+                    "user_id": str(user.id) # type: ignore
                 },
                 status=status.HTTP_200_OK
             )
@@ -87,6 +94,7 @@ def login(request):
         )
         
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def logout_user(request):
 
     auth.logout(request)
@@ -98,105 +106,122 @@ def logout_user(request):
         status=200
     )
         
-@api_view(["GET"])
-def get_users(request):
-    users = User.objects.all()
-    print(users)
-    
-    if not users.exists():
-        return JsonResponse(
-                    {
-            "message": "None of the user were found"
-        },
-        status=304
-        )
-    else:
-
-        serializer = UserBaseSerializer(users, many=True)
-
-    return JsonResponse(
-        serializer.data,
-        safe=False,
-        status=200
-    )
-    
-@api_view(["GET"])
-def get_user(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-
-        serializer = UserBaseSerializer(user)
-
-        return JsonResponse(serializer.data)
-
-    except User.DoesNotExist:
-        return JsonResponse(
-            {"error": "User not found"},
-            status=404
-        )
-@api_view(["GET"])
-def me(request):
-
-    if not request.user.is_authenticated:
-        return JsonResponse(
-            {"error": "Not authenticated"},
-            status=401
-        )
-
-    serializer = UserBaseSerializer(request.user)
-
-    return JsonResponse(serializer.data)
-
-@api_view(["PUT"])
-def update_user(request, user_id):
-
-    try:
-        user = User.objects.get(id=user_id)
-
-        user.first_name = request.data.get(
-            "first_name",
-            user.first_name
-        )
-
-        user.last_name = request.data.get(
-            "last_name",
-            user.last_name
-        )
-
-        user.bio = request.data.get(
-            "bio",
-            user.bio
-        )
-
-        user.save()
-
-        serializer = UserBaseSerializer(user)
-
-        return JsonResponse(serializer.data)
-
-    except User.DoesNotExist:
-        return JsonResponse(
-            {"error": "User not found"},
-            status=404
-        )
         
-@api_view(["DELETE"])
-def delete_user(request, user_id):
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def get_users(request):
+#     users = User.objects.all()
+#     print(users)
+    
+#     if not users.exists():
+#         return JsonResponse(
+#                     {
+#             "message": "None of the user were found"
+#         },
+#         status=304
+#         )
+#     else:
 
-    try:
-        user = User.objects.get(id=user_id)
+#         serializer = UserBaseSerializer(users, many=True)
 
-        user.delete()
+#     return JsonResponse(
+#         serializer.data,
+#         safe=False,
+#         status=200
+#     )
+    
+# @api_view(["GET"])
+# @permission_classes([IsAuthenticated])
+# def get_user(request, user_id):
+#     try:
+#         user = User.objects.get(id=user_id)
 
-        return JsonResponse(
-            {"message": "User deleted"}
-        )
+#         serializer = UserBaseSerializer(user)
 
-    except User.DoesNotExist:
-        return JsonResponse(
-            {"error": "User not found"},
-            status=404
-        )
+#         return JsonResponse(serializer.data)
+
+#     except User.DoesNotExist:
+#         return JsonResponse(
+#             {"error": "User not found"},
+#             status=404
+#         )
+# @api_view(["GET"])
+# def me(request):
+
+#     if not request.user.is_authenticated:
+#         return JsonResponse(
+#             {"error": "Not authenticated"},
+#             status=401
+#         )
+
+#     serializer = UserBaseSerializer(request.user)
+
+#     return JsonResponse(serializer.data)
+
+# @api_view(["PUT"])
+# @permission_classes([IsAuthenticated])
+# def update_user(request, user_id):
+
+#     try:
+#         user = User.objects.get(id=user_id)
+
+#         user.first_name = request.data.get(
+#             "first_name",
+#             user.first_name
+#         )
+
+#         user.last_name = request.data.get(
+#             "last_name",
+#             user.last_name
+#         )
+
+#         user.bio = request.data.get(
+#             "bio",
+#             user.bio
+#         )
+
+#         user.save()
+
+#         serializer = UserBaseSerializer(user)
+
+#         return JsonResponse(serializer.data)
+
+#     except User.DoesNotExist:
+#         return JsonResponse(
+#             {"error": "User not found"},
+#             status=404
+#         )
+        
+# @api_view(["DELETE"])
+# @permission_classes([IsAuthenticated])
+# def delete_user(request, user_id):
+
+#     try:
+#         user = User.objects.get(id=user_id)
+
+#         user.delete()
+
+#         return JsonResponse(
+#             {"message": "User deleted"}
+#         )
+
+#     except User.DoesNotExist:
+#         return JsonResponse(
+#             {"error": "User not found"},
+#             status=404
+#         )
         
         
         

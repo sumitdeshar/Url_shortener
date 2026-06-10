@@ -10,10 +10,15 @@ class Link(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     original_link = models.URLField(max_length=2048)
-    short_link = models.CharField(max_length=20, unique=True, db_index=True)
+    short_link = models.CharField(max_length=20, unique=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     expires_at = models.DateTimeField(null=True, blank=True)
+    
+    domain = models.CharField(max_length=100, null=True, blank=True)
+    
+    
     click_count = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
