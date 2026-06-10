@@ -38,10 +38,10 @@ The goal of this project is to build a basic URL shortening service that:
 
 ### 🧠 Planned Improvements
 
-- Redis caching for faster redirects
-- Click tracking and analytics
+- Redis caching for faster redirects -Done
+- Click tracking and analytics -Done
 - Background processing using message queues
-- URL expiration support
+- URL expiration support - Done
 - Rate limiting per IP/user
 
 ---
@@ -52,23 +52,15 @@ Client Request
 ↓
 Django Server
 ↓
+Redis Cache
+↓
 PostgreSQL Database
 ↓
 Redirect to Original URL
 
-### Future Scalable Flow
-
-Client → Django → Redis (Cache Check)
-↓ miss
-PostgreSQL
-↓
-Background Queue (Analytics / Logs)
-
----
-
 ## 📦 Project Status
 
-This project is currently in the **early development stage** as part of a **technical skill evaluation for interviews**.  
+This project is currently in the **early development stage**.
 The focus is on implementing core functionality first, followed by performance optimization and scalability improvements.
 
 ---
@@ -81,7 +73,6 @@ This project demonstrates understanding of:
 - REST API design principles
 - Database modeling with PostgreSQL
 - Caching strategies using Redis
-- Introduction to message queues and async processing
 - Basic system design concepts
 
 ---
@@ -90,8 +81,6 @@ This project demonstrates understanding of:
 
 - Custom short URLs (user-defined aliases)
 - User authentication system
-- Analytics dashboard
-- Rate limiting per user/IP
 - Docker-based deployment
 
 ---
@@ -100,4 +89,3 @@ This project demonstrates understanding of:
 
 This is a learning-focused project created for interview preparation.  
 The architecture is intentionally simple and will evolve as features are added.
-This is build with AI wording on top of my documentations idea.

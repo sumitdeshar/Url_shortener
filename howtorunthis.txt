@@ -1,0 +1,60 @@
+
+STEP WISE GUIDE TO RUN THIS ON LOCAL SYSTEM
+
+
+To pull and run your complete URL shortener on a new system, use Docker Compose.
+
+On the new system:
+
+Create a docker-compose.yml file:
+version: '3.8'
+services:
+  web:
+    image: humbledocked/url_shortener:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/urlshortener
+      - REDIS_URL=redis://redis:6379
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=urlshortener
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+Run the stack:
+docker compose up -d
+
+This will:
+    Pull my web image from humbledocked/url_shortener:latest
+    Pull PostgreSQL and Redis from Docker Hub
+
+    Start all three services connected together
+    My app will be accessible at http://localhost:8000
+
+Verify everything is running:
+    docker compose ps
+
+View logs:
+    docker compose logs -f web
+
+Stop everything:
+    docker compose down
+
+
+Unfortunately there is no UI and render deployment is failed for some reason and also need some online db platform to share db data.
