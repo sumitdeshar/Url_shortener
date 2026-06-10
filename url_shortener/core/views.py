@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,8 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 
-from .utlis import generate_shortcode, build_char_map, build_short_url
+from .utlis import generate_shortcode, build_char_map, build_short_url, increment_click, increment_click_from_cache
 from .models import CharMap, Link
+import threading
 
 from .serializers import *
 
@@ -107,20 +109,25 @@ def shorten_url(request):
             return JsonResponse({"error": "Lookup table missing"}, status=400)
         char_map = lookup_entry.char_map
 
-        shortcode_result = generate_shortcode(shortcode_length=shortcode_length,lookup_table=char_map) # type: ignore
-        print(shortcode_result)
+        shortcode = generate_shortcode(shortcode_length, char_map) # type: ignore
+        print(shortcode)
         # print ('done serializing4')
         
-        if shortcode_result:
-            short_url=build_short_url(shortcode=shortcode_result['shortcode'], user_domain=custom_domain)
+        if shortcode:
+            short_url=build_short_url(shortcode=shortcode, user_domain=custom_domain)
             
-            Link.objects.create(short_link=shortcode_result['shortcode'], original_link=original_url, owner=request.user)
+            link_obj = Link.objects.create(
+            short_link=shortcode,
+            original_link=original_url,
+            owner=request.user,
+            domain=custom_domain
+        )
             # print ('done serializing5')
 
-            return JsonResponse({
-                'original': original_url,
-                'short url': short_url,
-            })
+            return Response({
+            "link": LinkResponseSerializer(link_obj).data,
+            "short_url": short_url
+        })
         else:
             return JsonResponse({
                 "error": "Shortcode is not generated"
@@ -134,4 +141,26 @@ def shorten_url(request):
             },
             status=500
         )
-    
+
+
+#have not been full tested work for basic conditions 
+def redirect_short_url(request, shortcode):
+    cached_url = cache.get(shortcode)
+
+    if cached_url:
+        threading.Thread(
+            target=increment_click_from_cache,
+            args=(shortcode,)
+        ).start()
+
+        return redirect(cached_url)
+
+    link = get_object_or_404(Link, short_link=shortcode, is_active=True)
+    cache.set(shortcode, link.original_link, timeout=60 * 60 * 24 * 30)
+
+    threading.Thread(
+        target=increment_click, 
+        args=(link.id,)
+        ).start()
+
+    return redirect(link.original_link)

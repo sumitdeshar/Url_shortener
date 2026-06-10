@@ -23,6 +23,19 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    command:
+      [
+        "redis-server",
+        "--maxmemory",
+        "100mb",
+        "--maxmemory-policy",
+        "allkeys-lfu",
+      ]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   web:
     build: .

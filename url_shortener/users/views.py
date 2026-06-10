@@ -16,7 +16,10 @@ User = get_user_model()
 from django.shortcuts import render
 
 def home(request):
-    return render(request, "home.html")
+    context = {
+        'hi':"hello"
+    }
+    return render(request, "home.html", context)
 
 @api_view(["POST"])
 def  register_user(request):
